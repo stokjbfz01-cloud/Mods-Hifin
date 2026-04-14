@@ -498,7 +498,7 @@ visibility: hidden;
 </div>  
 </div>  <!-- MENU PANEL -->  <div class="panel" id="menuPanel">    
 <div class="box">    
-<h3>Menu Developer</h3>    <div id="menuButtons" style="display:flex; gap:10px;"></div>  
+<h3 id="menuTitle">Menu Developer</h3>    <div id="menuButtons" style="display:flex; gap:10px;"></div>  
 </div>    
 </div>  <!-- UPLOAD -->  <div class="panel" id="uploadPanel">    
 <div class="box">    
@@ -709,24 +709,26 @@ let currentIndex = 0;
 function openPin(){ pinPanel.style.display="block"; }    
 function checkPin(){    
     const pin = pinInput.value;  
-  
+
     pinPanel.style.display = "none";  
     menuPanel.style.display = "block";  
-  
+
     const menu = document.getElementById("menuButtons");  
-  
-    // RESET isi menu  
+    const title = document.getElementById("menuTitle");
+
     menu.innerHTML = "";  
-  
+
     if(pin === "0000"){  
-        // MODE USER (UPLOAD ONLY)  
+        title.innerText = "Menu Upload Mod"; // 🔥 INI YANG KAMU MAU
+
         menu.innerHTML = `  
             <button onclick="openUpload()">Upload Mod</button>  
             <button onclick="closeMenu()" style="background:#ccc;color:#333;">Tutup</button>  
         `;  
     }   
     else if(pin === "1234"){  
-        // MODE ADMIN (FULL)  
+        title.innerText = "Menu Developer"; // tetap
+
         menu.innerHTML = `  
             <button onclick="openUpload()">Upload Mod</button>  
             <button onclick="openEdit()">Edit Mod</button>  
@@ -738,7 +740,7 @@ function checkPin(){
         pinPanel.style.display = "block";  
         menuPanel.style.display = "none";  
     }  
-}  
+}
   
 function closePin(){  
     pinPanel.style.display = "none";  
