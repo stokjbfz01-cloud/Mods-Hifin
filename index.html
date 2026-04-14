@@ -599,21 +599,21 @@ body::before {
 <input type="file" id="editImage2">
 <div class="progress-box">
   <div class="progress-bar" id="editProgress2"></div>
-  <span id="editProgressText1">0%</span>
+  <span id="editProgressText2">0%</span>
 </div>
 
 <label>Gambar 3</label>
 <input type="file" id="editImage3">
 <div class="progress-box">
   <div class="progress-bar" id="editProgress3"></div>
-  <span id="editProgressText1">0%</span>
+  <span id="editProgressText3">0%</span>
 </div>
 
 <label>Gambar 4</label>
 <input type="file" id="editImage4">
 <div class="progress-box">
   <div class="progress-bar" id="editProgress4"></div>
-  <span id="editProgressText1">0%</span>
+  <span id="editProgressText4">0%</span>
 </div>
 
 <button onclick="updateMod()">Simpan Perubahan</button>
@@ -827,7 +827,9 @@ async function saveMod(){
         alert("Upload gagal: " + err.message);
 
     } finally {
-    }
+    btn.innerText = "Simpan";
+    btn.disabled = false;
+}
 }
 
 // helper
@@ -1150,26 +1152,50 @@ document.querySelectorAll(".cat").forEach(el=>{
 }
 
 async function uploadImage(file, retry = 2){
+    console.log("UPLOAD FILE:", file.name, file.size);
+    const base64 = await toBase64(file);
+
     for(let i = 0; i <= retry; i++){
         try{
-            const formData = new FormData();
-            formData.append("image", file);
-
-            const res = await fetch("https://api.imgbb.com/1/upload?key=75b94064750b4a3974e1e5f4fb780a08", {
+            const res = await fetchWithTimeout("https://api.imgbb.com/1/upload?key=75b94064750b4a3974e1e5f4fb780a08", {
                 method: "POST",
-                body: formData
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({
+                    image: base64
+                })
             });
 
-            const data = await res.json();
+            if(!res.ok){
+                throw new Error("HTTP ERROR: " + res.status);
+            }
 
-            if(!data.success) throw new Error("API gagal");
+            const data = await res.json();
+            
+            console.log("IMG RESPONSE:", data);
+
+            if(!data.success){
+                throw new Error("IMG FAIL");
+            }
 
             return data.data.display_url;
 
         } catch(err){
+            console.error("UPLOAD ERROR:", err);
+
             if(i === retry) throw err;
         }
     }
+}
+
+function fetchWithTimeout(url, options, timeout = 15000){
+    return Promise.race([
+        fetch(url, options),
+        new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Timeout")), timeout)
+        )
+    ]);
 }
 
 image1.onchange = () => previewImage(image1);
@@ -1209,7 +1235,6 @@ setInterval(async () => {
 }, 10000);
 
 /* INTRO */
-const introText = document.getElementById("introText");
 const app = document.getElementById("app");
 
 window.addEventListener("load", () => {
