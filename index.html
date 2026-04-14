@@ -501,13 +501,9 @@ body::before {
 </div>
 </div>  <!-- MENU PANEL -->  <div class="panel" id="menuPanel">  
 <div class="box">  
-<h3>Menu Developer</h3>  
+<h3 id="menuTitle">Menu</h3>  
 
-<div style="display:flex; gap:10px;">
-    <button onclick="openUpload()">Upload Mod</button>  
-    <button onclick="openEdit()">Edit Mod</button>  
-    <button onclick="closeMenu()" style="background:#ccc;color:#333;">Tutup</button>
-</div>
+<div id="menuButtons" style="display:flex; gap:10px;"></div>
 </div>  
 </div>  <!-- UPLOAD -->  <div class="panel" id="uploadPanel">  
 <div class="box">  
@@ -753,13 +749,41 @@ let currentIndex = 0;
 /* PIN */  
 function openPin(){ pinPanel.style.display="block"; }  
 function checkPin(){  
-    if(pinInput.value==="0000"){  
-        pinPanel.style.display="none";  
-        menuPanel.style.display="block";  
-    } else {  
-        alert("PIN salah!");  
-    }  
-}  
+    const pin = pinInput.value;
+
+    pinPanel.style.display = "none";
+    menuPanel.style.display = "block";
+
+    const menu = document.getElementById("menuButtons");
+    const title = document.getElementById("menuTitle");
+
+    menu.innerHTML = "";
+
+    if(pin === "0000"){
+        // UBAH JUDUL
+        title.innerText = "Menu Upload Mods";
+
+        menu.innerHTML = `
+            <button onclick="openUpload()">Upload Mod</button>
+            <button onclick="closeMenu()" style="background:#ccc;color:#333;">Tutup</button>
+        `;
+    } 
+    else if(pin === "089514"){
+        // UBAH JUDUL
+        title.innerText = "Menu Developer";
+
+        menu.innerHTML = `
+            <button onclick="openUpload()">Upload Mod</button>
+            <button onclick="openEdit()">Edit Mod</button>
+            <button onclick="closeMenu()" style="background:#ccc;color:#333;">Tutup</button>
+        `;
+    } 
+    else {
+        alert("PIN salah!");
+        pinPanel.style.display = "block";
+        menuPanel.style.display = "none";
+    }
+}
 
 function closePin(){
     pinPanel.style.display = "none";
