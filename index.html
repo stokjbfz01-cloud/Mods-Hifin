@@ -496,7 +496,7 @@ visibility: hidden;
 </div>  
 </div>  <!-- MENU PANEL -->  <div class="panel" id="menuPanel">    
 <div class="box">    
-<h3 id="menuTitle">Menu</h3>    <div id="menuButtons" style="display:flex; gap:10px;"></div>  
+<h3>Menu Developer</h3>    <div id="menuButtons" style="display:flex; gap:10px;"></div>  
 </div>    
 </div>  <!-- UPLOAD -->  <div class="panel" id="uploadPanel">    
 <div class="box">    
@@ -712,23 +712,19 @@ function checkPin(){
     menuPanel.style.display = "block";  
   
     const menu = document.getElementById("menuButtons");  
-    const title = document.getElementById("menuTitle");  
   
+    // RESET isi menu  
     menu.innerHTML = "";  
   
     if(pin === "0000"){  
-        // UBAH JUDUL  
-        title.innerText = "Menu Upload Mods";  
-  
+        // MODE USER (UPLOAD ONLY)  
         menu.innerHTML = `  
             <button onclick="openUpload()">Upload Mod</button>  
             <button onclick="closeMenu()" style="background:#ccc;color:#333;">Tutup</button>  
         `;  
     }   
-    else if(pin === "089514"){  
-        // UBAH JUDUL  
-        title.innerText = "Menu Developer";  
-  
+    else if(pin === "1234"){  
+        // MODE ADMIN (FULL)  
         menu.innerHTML = `  
             <button onclick="openUpload()">Upload Mod</button>  
             <button onclick="openEdit()">Edit Mod</button>  
