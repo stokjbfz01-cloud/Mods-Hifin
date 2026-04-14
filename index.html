@@ -745,11 +745,6 @@ let currentCategory = "ALL";
 let editIndex = null;  
 let currentImages = [];
 let currentIndex = 0;
-// STATE UPLOAD
-let uploadQueue = [];
-let uploadedImages = [];
-let editUploadedImages = [];
-let isUploading = false;
   
 /* PIN */  
 function openPin(){ pinPanel.style.display="block"; }  
@@ -807,50 +802,58 @@ async function openEdit(){
     loadEditList();   // baru tampilkan  
 }  
   
-  if(uploadQueue.length > 0 || isUploading){
-    return alert("Tunggu upload selesai dulu!");
-}
-  
 /* SAVE KE FIREBASE */  
-async function saveMod(){
+async function saveMod(){  
+    const files = [
+        image1.files[0],
+        image2.files[0],
+        image3.files[0],
+        image4.files[0]
+    ].filter(f => f);
 
-    if(uploadQueue.length > 0 || isUploading){
-        return alert("Tunggu upload selesai dulu!");
-    }
-
-    if(uploadedImages.length === 0){
-        return alert("Upload gambar dulu!");
-    }
+    if(files.length === 0) return alert("Pilih minimal 1 gambar!");
 
     const btn = document.querySelector("button[onclick='saveMod()']");
-    btn.innerText = "Menyimpan...";
+    btn.innerText = "Uploading...";
     btn.disabled = true;
 
     try {
+        let imageUrls = [];
+
+        for(let i = 0; i < files.length; i++){
+            const file = files[i];
+
+            const done = await simulateProgress(
+                "progress" + (i + 1),
+                "progressText" + (i + 1)
+            );
+
+            const url = await uploadImage(file);
+            imageUrls.push(url);
+
+            done();
+        }
 
         await db.collection("mods").add({
             title: title.value,
             desc: desc.value,
             category: category.value,
             link: link.value,
-            images: uploadedImages
+            images: imageUrls
         });
 
-        alert("Berhasil disimpan!");
-
-        // reset
-        uploadedImages = [];
-        uploadQueue = [];
-
+        alert("Upload berhasil!");
         uploadPanel.style.display = "none";
         loadModsRealtime();
 
-    } catch(err){
-        alert("Gagal: " + err.message);
-    }
+    } catch(err) {
+        console.error(err);
+        alert("Upload gagal: " + err.message);
 
+    } finally {
     btn.innerText = "Simpan";
     btn.disabled = false;
+}
 }
 
 // helper
@@ -884,40 +887,6 @@ function simulateProgress(barId, textId){
             document.getElementById(textId).innerText = "100%";
         });
     });
-}
-
-async function processQueue(){
-    if(isUploading) return;
-
-    isUploading = true;
-
-    while(uploadQueue.length > 0){
-        const item = uploadQueue.shift();
-
-        const { file, barId, textId, isEdit } = item;
-
-        try {
-            const done = await simulateProgress(barId, textId);
-
-            const url = await uploadImage(file);
-
-            if(isEdit){
-    edituploadedImages.push(url);
-} else {
-    uploadedImages.push(url);
-}
-
-            done();
-
-            // delay 1 detik
-            await new Promise(res => setTimeout(res, 1000));
-
-        } catch(err){
-            console.error("UPLOAD ERROR:", err);
-        }
-    }
-
-    isUploading = false;
 }
   
 /* LOAD DATA DARI FIREBASE */  
@@ -991,38 +960,45 @@ async function deleteMod(index){
 }  
   
 async function updateMod(){
-
-    if(uploadQueue.length > 0 || isUploading){
-        return alert("Tunggu upload selesai dulu!");
-    }
-    
-    if(uploadedImages.length === 0){
-    return alert("Upload gambar dulu!");
-}
-
-    if(editIndex === null){
-        return alert("Pilih mod dulu!");
-    }
+    if(editIndex === null) return alert("Pilih mod dulu!");
 
     const mod = mods[editIndex];
+    let imageUrls = mod.images;
+
+    const files = [
+    editImage1.files[0],
+    editImage2.files[0],
+    editImage3.files[0],
+    editImage4.files[0]
+].filter(f => f);
+
+    if(files.length > 0){
+        imageUrls = [];
+
+        for(let i=0; i<files.length; i++){
+    const file = files[i];
+
+    const done = await simulateProgress(
+    "editProgress" + (i + 1),
+    "editProgressText" + (i + 1)
+);
+            const url = await uploadImage(file);
+imageUrls.push(url);
+            done();
+        }
+    }
 
     await db.collection("mods").doc(mod.id).update({
         title: editTitle.value,
         desc: editDesc.value,
         category: editCategory.value,
         link: editLink.value,
-        images: editUploadedImages.length > 0 
-            ? editUploadedImages 
-            : mod.images
+        images: imageUrls
     });
 
-    alert("Berhasil update!");
+    alert("Mod berhasil diupdate!");
 
-    // reset
-    editUploadedImages = [];
-    uploadQueue = [];
     editIndex = null;
-
     loadModsRealtime();
     loadEditList();
 }
@@ -1184,16 +1160,8 @@ document.querySelectorAll(".cat").forEach(el=>{
   
   function previewImage(input){
     const preview = document.getElementById("previewImages");
-    preview.innerHTML = "";
 
-    const files = input.files;
-
-for(let file of files){
-    const img = document.createElement("img");
-    img.src = URL.createObjectURL(file);
-
-    preview.appendChild(img);
-}
+    const file = input.files[0];
     if(!file) return;
 
     const img = document.createElement("img");
@@ -1245,39 +1213,6 @@ async function uploadImage(file, retry = 2){
     }
 }
 
-function handleImageUpload(input, index){
-    const file = input.files[0];
-    if(!file) return;
-
-    previewImage(input);
-
-    uploadQueue.push({
-    file: file,
-    index: index,
-    barId: "progress" + index,
-    textId: "progressText" + index,
-    isEdit: false
-});
-
-    processQueue();
-}
-
-function handleEditUpload(input, index){
-    const file = input.files[0];
-    if(!file) return;
-
-    previewImage(input);
-
-    uploadQueue.push({
-        file: file,
-        barId: "editProgress" + index,
-        textId: "editProgressText" + index,
-        isEdit: true
-    });
-
-    processQueue();
-}
-
 function fetchWithTimeout(url, options, timeout = 15000){
     return Promise.race([
         fetch(url, options),
@@ -1287,15 +1222,15 @@ function fetchWithTimeout(url, options, timeout = 15000){
     ]);
 }
 
-image1.onchange = () => handleImageUpload(image1, 1);
-image2.onchange = () => handleImageUpload(image2, 2);
-image3.onchange = () => handleImageUpload(image3, 3);
-image4.onchange = () => handleImageUpload(image4, 4);
+image1.onchange = () => previewImage(image1);
+image2.onchange = () => previewImage(image2);
+image3.onchange = () => previewImage(image3);
+image4.onchange = () => previewImage(image4);
 
-editImage1.onchange = () => handleEditUpload(editImage1, 1);
-editImage2.onchange = () => handleEditUpload(editImage2, 2);
-editImage3.onchange = () => handleEditUpload(editImage3, 3);
-editImage4.onchange = () => handleEditUpload(editImage4, 4);
+editImage1.onchange = () => previewImage(editImage1);
+editImage2.onchange = () => previewImage(editImage2);
+editImage3.onchange = () => previewImage(editImage3);
+editImage4.onchange = () => previewImage(editImage4);
   
   const editPanel = document.getElementById("editPanel");
   const editFormPanel = document.getElementById("editFormPanel");
@@ -1309,6 +1244,19 @@ detailPanel.addEventListener("click", function(e){
         return;
     }
 });
+
+setInterval(async () => {
+    const snapshot = await db.collection("mods").get();
+    let newData = [];
+
+    snapshot.forEach(doc=>{
+        newData.push(doc.id);
+    });
+
+    if(newData.length !== mods.length){
+        loadModsRealtime();
+    }
+}, 10000);
 
 /* INTRO */
 const app = document.getElementById("app");
