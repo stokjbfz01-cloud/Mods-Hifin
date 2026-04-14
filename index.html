@@ -528,22 +528,22 @@ body::before {
 <label>Gambar 2</label>
 <input type="file" id="image2">
 <div class="progress-box">
-  <div class="progress-bar" id="progress1"></div>
-  <span id="progressText1">0%</span>
+  <div class="progress-bar" id="progress2"></div>
+  <span id="progressText2">0%</span>
 </div>
 
 <label>Gambar 3</label>
 <input type="file" id="image3">
 <div class="progress-box">
-  <div class="progress-bar" id="progress1"></div>
-  <span id="progressText1">0%</span>
+  <div class="progress-bar" id="progress3"></div>
+  <span id="progressText3">0%</span>
 </div>
 
 <label>Gambar 4</label>
 <input type="file" id="image4">
 <div class="progress-box">
-  <div class="progress-bar" id="progress1"></div>
-  <span id="progressText1">0%</span>
+  <div class="progress-bar" id="progress4"></div>
+  <span id="progressText4">0%</span>
 </div>
 
 <div id="previewImages" style="display:flex; gap:5px; flex-wrap:wrap;"></div>
@@ -598,21 +598,21 @@ body::before {
 <label>Gambar 2</label>
 <input type="file" id="editImage2">
 <div class="progress-box">
-  <div class="progress-bar" id="editProgress1"></div>
+  <div class="progress-bar" id="editProgress2"></div>
   <span id="editProgressText1">0%</span>
 </div>
 
 <label>Gambar 3</label>
 <input type="file" id="editImage3">
 <div class="progress-box">
-  <div class="progress-bar" id="editProgress1"></div>
+  <div class="progress-bar" id="editProgress3"></div>
   <span id="editProgressText1">0%</span>
 </div>
 
 <label>Gambar 4</label>
 <input type="file" id="editImage4">
 <div class="progress-box">
-  <div class="progress-bar" id="editProgress1"></div>
+  <div class="progress-bar" id="editProgress4"></div>
   <span id="editProgressText1">0%</span>
 </div>
 
@@ -753,7 +753,7 @@ let currentIndex = 0;
 /* PIN */  
 function openPin(){ pinPanel.style.display="block"; }  
 function checkPin(){  
-    if(pinInput.value==="089514"){  
+    if(pinInput.value==="0000"){  
         pinPanel.style.display="none";  
         menuPanel.style.display="block";  
     } else {  
@@ -781,11 +781,12 @@ async function openEdit(){
 /* SAVE KE FIREBASE */  
 async function saveMod(){  
     const files = [
-    image1.files[0],
-    image2.files[0],
-    image3.files[0],
-    image4.files[0]
-].filter(f => f);
+        image1.files[0],
+        image2.files[0],
+        image3.files[0],
+        image4.files[0]
+    ].filter(f => f);
+
     if(files.length === 0) return alert("Pilih minimal 1 gambar!");
 
     const btn = document.querySelector("button[onclick='saveMod()']");
@@ -795,22 +796,17 @@ async function saveMod(){
     try {
         let imageUrls = [];
 
-        for(let i=0; i<files.length; i++){
-    const file = files[i];
+        for(let i = 0; i < files.length; i++){
+            const file = files[i];
 
-    const done = await simulateProgress("progress"+(i+1), "progressText"+(i+1));
-            const base64 = await toBase64(file);
+            const done = await simulateProgress(
+                "progress" + (i + 1),
+                "progressText" + (i + 1)
+            );
 
-            const formData = new FormData();
-            formData.append("image", base64);
+            const url = await uploadImage(file);
+            imageUrls.push(url);
 
-            const res = await fetch("https://api.imgbb.com/1/upload?key=75b94064750b4a3974e1e5f4fb780a08", {
-                method: "POST",
-                body: formData
-            });
-
-            const data = await res.json();
-            imageUrls.push(data.data.display_url);
             done();
         }
 
@@ -819,21 +815,19 @@ async function saveMod(){
             desc: desc.value,
             category: category.value,
             link: link.value,
-            images: imageUrls // 🔥 ARRAY
+            images: imageUrls
         });
 
         alert("Upload berhasil!");
-        uploadPanel.style.display="none";
+        uploadPanel.style.display = "none";
         loadModsRealtime();
 
-    } catch(err){
+    } catch(err) {
         console.error(err);
-        alert("Upload gagal!");
+        alert("Upload gagal: " + err.message);
+
     } finally {
-        btn.innerText = "Simpan";
-        btn.disabled = false;
     }
-    console.log("TOTAL FILE:", files.length);
 }
 
 // helper
@@ -958,19 +952,12 @@ async function updateMod(){
         for(let i=0; i<files.length; i++){
     const file = files[i];
 
-    const done = await simulateProgress("editProgress"+(i+1), "editProgressText"+(i+1));
-            const base64 = await toBase64(file);
-
-            const formData = new FormData();
-            formData.append("image", base64);
-
-            const res = await fetch("https://api.imgbb.com/1/upload?key=75b94064750b4a3974e1e5f4fb780a08", {
-                method: "POST",
-                body: formData
-            });
-
-            const data = await res.json();
-            imageUrls.push(data.data.display_url);
+    const done = await simulateProgress(
+    "editProgress" + (i + 1),
+    "editProgressText" + (i + 1)
+);
+            const url = await uploadImage(file);
+imageUrls.push(url);
             done();
         }
     }
@@ -1160,6 +1147,29 @@ document.querySelectorAll(".cat").forEach(el=>{
     img.src = URL.createObjectURL(file);
 
     preview.appendChild(img);
+}
+
+async function uploadImage(file, retry = 2){
+    for(let i = 0; i <= retry; i++){
+        try{
+            const formData = new FormData();
+            formData.append("image", file);
+
+            const res = await fetch("https://api.imgbb.com/1/upload?key=75b94064750b4a3974e1e5f4fb780a08", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await res.json();
+
+            if(!data.success) throw new Error("API gagal");
+
+            return data.data.display_url;
+
+        } catch(err){
+            if(i === retry) throw err;
+        }
+    }
 }
 
 image1.onchange = () => previewImage(image1);
