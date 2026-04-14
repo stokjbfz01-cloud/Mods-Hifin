@@ -902,9 +902,9 @@ async function processQueue(){
             const url = await uploadImage(file);
 
             if(isEdit){
-    editUploadedImages[item.index - 1] = url;
+    edituploadedImages.push(url);
 } else {
-    uploadedImages[item.index - 1] = url;
+    uploadedImages.push(url);
 }
 
             done();
@@ -995,6 +995,10 @@ async function updateMod(){
     if(uploadQueue.length > 0 || isUploading){
         return alert("Tunggu upload selesai dulu!");
     }
+    
+    if(uploadedImages.length === 0){
+    return alert("Upload gambar dulu!");
+}
 
     if(editIndex === null){
         return alert("Pilih mod dulu!");
@@ -1182,7 +1186,14 @@ document.querySelectorAll(".cat").forEach(el=>{
     const preview = document.getElementById("previewImages");
     preview.innerHTML = "";
 
-    const file = input.files[0];
+    const files = input.files;
+
+for(let file of files){
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(file);
+
+    preview.appendChild(img);
+}
     if(!file) return;
 
     const img = document.createElement("img");
