@@ -1,1362 +1,180 @@
-<!DOCTYPE html>  <html lang="id">    <head>      <meta charset="UTF-8">      
-<meta name="viewport" content="width=device-width, initial-scale=1.0">      
-<title>HiFin Mods</title>  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">     
-<link rel="preconnect" href="https://images.weserv.nl">    
-<link rel="dns-prefetch" href="https://images.weserv.nl">    
-<style>      
-body {      
-    margin:0;    
-    font-family: Poppins,     
-                 "Segoe UI Emoji",     
-                 "Apple Color Emoji",     
-                 "Noto Color Emoji",     
-                 sans-serif;    
-    overflow-x:hidden;      
-    background: linear-gradient(270deg, #e3f2fd, #bbdefb, #90caf9, #e3f2fd);      
-    background-size: 600% 600%;      
-    animation: gradientMove 4s ease infinite;      
-}    /* HEADER */  
-.header {  
-background: linear-gradient(135deg,#1e88e5,#42a5f5);  
-color:white;  
-padding:15px;  
-box-shadow:0 4px 10px rgba(0,0,0,0.1);  
-} 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
- .header-top {
-display:flex;
-justify-content:space-between;
-align-items:center;
-display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
-.logo {
-cursor:pointer;
-font-weight:bold;
-font-size:18px;
-transition:0.3s;
-}
-.logo:hover {
-transform:scale(1.05);
-}
+body {
+  height: 100vh;
+  overflow: hidden;
 
-/* SEARCH */
-.search {
-padding:8px 15px;
-border-radius:20px;
-border:none;
-outline:none;
-transition:0.3s;
-flex: 1;
-min-width: 0;
-}
-.search:focus {
-box-shadow:0 0 10px rgba(255,255,255,0.7);
-}
-
-/* CATEGORY */
-.categories {
-display:flex;
-gap:10px;
-padding:10px;
-overflow-x:auto;
-}
-
-.cat {
-padding:3px 7px;
-border-radius:20px;
-cursor:pointer;
-transition:0.3s;
-background:white;
-}
-.cat:hover {
-background:#e3f2fd;
-}
-
-.cat.active {
-background:#1e88e5;
-color:white;
-box-shadow:0 2px 8px rgba(30,136,229,0.4);
-}
-
-/* GRID */
-.mods {
-padding:15px;
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:15px;
-contain: layout style paint;
-}
-
-.card-content h4 {
-display: -webkit-box;
--webkit-line-clamp: 1; /* maksimal 1 baris */
--webkit-box-orient: vertical;
-overflow: hidden;
-text-overflow: ellipsis;
-}
-
-.card-content p {
-display: -webkit-box;
--webkit-line-clamp: 2; /* bisa ubah jadi 3 kalau mau */
--webkit-box-orient: vertical;
-overflow: hidden;
-text-overflow: ellipsis;
-}
-
-.thumb {
-width: 100%;
-aspect-ratio: 16 / 9;
-overflow: hidden;
-background: linear-gradient(90deg, #eee, #ddd, #eee);
-background-size: 200% 100%;
-animation: loading 1.2s infinite;
-}
-
-@keyframes loading {
-0% { background-position: 200% 0; }
-100% { background-position: -200% 0; }
-}
-
-/* CARD */
-.card {
-background:white;
-border-radius:15px;
-overflow:hidden;
-box-shadow:0 4px 15px rgba(0,0,0,0.08);
-transition: transform 0.25s ease, box-shadow 0.25s ease;
-will-change: transform;
-transform: translateZ(0);
-backface-visibility: hidden;
-perspective: 1000px;
-}
-
-.card:hover {
-transform: translateY(-6px) scale(1.03);
-box-shadow:0 15px 30px rgba(0,0,0,0.2);
-}
-
-.card:active {
-transform: scale(0.97);
-}
-
-.thumb {
-width: 100%;
-aspect-ratio: 16 / 9; /* ini yang bikin 16:9 */
-overflow: hidden;
-background: #eee;
-}
-
-.thumb img {
-width: 100%;
-height: 100%;
-object-fit: cover;
-}
-
-.card img {
-width:100%;
-object-fit:cover;
-transition:0.3s;
-background:#eee;
-will-change: transform, opacity;
-}
-
-.card img.loaded {
-filter: blur(0);
-}
-
-.card:hover img {
-transform:scale(1.05);
-}
-
-.card-content {
-padding:10px;
-}
-
-/* BADGE */
-.badge {
-font-size:10px;
-background:linear-gradient(135deg,#ff5252,#ff1744);
-color:white;
-padding:4px 6px;
-border-radius:5px;
-}
-
-/* BUTTON */
-button {
-padding:10px;
-border:none;
-background:linear-gradient(135deg,#1e88e5,#42a5f5);
-color:white;
-cursor:pointer;
-border-radius:10px;
-transition: all 0.2s ease;
-transform: scale(1);
-}
-
-button:active {
-transform: scale(0.92);
-}
-
-button:hover {
-transform: scale(1.05);
-box-shadow:0 8px 20px rgba(30,136,229,0.4);
-}
-
-.download-btn {
-width:100%;
-margin-top:5px;
-}
-
-/* PANEL */
-.panel {
-display:none;
-overflow-y: auto;
-position:fixed;
-top:0;left:0;
-width:100%;height:100%;
-background:rgba(0,0,0,0.5);
-backdrop-filter:blur(5px);
-animation:fadeIn 0.3s;
-}
-
-#detailPanel {
-display:none;
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:white;
-z-index:9999;
-overflow-y:auto;
-}
-
-.detail-title-box {
-display:inline-block; /* INI KUNCINYA */
-margin-top:15px;
-padding:12px 15px;
-border-radius:10px;
-
-background: linear-gradient(135deg,#1e88e5,#42a5f5);
-color:white;
-
-box-shadow:0 4px 12px rgba(30,136,229,0.3);
-
-position:relative;
-overflow:hidden;
-
-}
-
-/* efek glow halus biar nggak flat */
-.detail-title-box::before {
-content:"";
-position:absolute;
-top:0;
-left:-100%;
-width:100%;
-height:100%;
-background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
-transition:0.5s;
-}
-
-.detail-title-box:hover::before {
-left:100%;
-}
-
-/* reset margin bawaan h2 */
-.detail-title-box h2 {
-margin:0;
-font-size:18px;
-}
-
-@keyframes fadeIn {
-from {opacity:0;}
-to {opacity:1;}
-}
-
-.box {
-background:white;
-padding:20px;
-max-width:400px;
-margin:80px auto;
-border-radius:15px;
-animation:slideUp 0.3s;
-}
-
-@keyframes slideUp {
-from {
-transform:translateY(30px);
-opacity:0;
-}
-to {
-transform:translateY(0);
-opacity:1;
-}
-}
-
-/* INPUT */
-input, textarea, select {
-width:100%;
-margin-bottom:10px;
-padding:10px;
-border-radius:8px;
-border:1px solid #ddd;
-outline:none;
-transition:0.3s;
-}
-
-input:focus, textarea:focus, select:focus {
-border-color:#1e88e5;
-box-shadow:0 0 5px rgba(30,136,229,0.3);
+  background: linear-gradient(270deg, #e3f2fd, #bbdefb, #90caf9, #e3f2fd);
+  background-size: 600% 600%;
+  animation: gradientMove 6s ease infinite;
 }
 
 body::before {
-content:"";
-position:fixed;
-width:200%;
-height:200%;
-top:-50%;
-left:-50%;
-background: radial-gradient(circle, rgba(66,165,245,0.2), transparent 70%);
-animation: floatBg 15s linear infinite;
-z-index:-1;
-}
-
-@keyframes floatBg {
-0% { transform:translate(0,0); }
-50% { transform:translate(50px,50px); }
-100% { transform:translate(0,0); }
-}
-
-@keyframes gradientMove {
-0% { background-position: 0% 50%; }
-50% { background-position: 100% 50%; }
-100% { background-position: 0% 50%; }
-}
-
-.progress-box {
-position: relative;
-height: 8px;
-background: #eee;
-border-radius: 10px;
-margin-bottom: 10px;
-overflow: hidden;
-}
-
-.progress-bar {
-height: 100%;
-width: 0%;
-background: linear-gradient(135deg,#1e88e5,#42a5f5);
-transition: width 0.3s ease;
-}
-
-.progress-box span {
-position: absolute;
-top: -20px;
-right: 0;
-font-size: 11px;
-}
-
-/* APP (HALAMAN UTAMA) */
-.app {
-opacity: 0;
-filter: blur(15px);
-transform: scale(1.05);
-transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.app.show {
-opacity: 1;
-filter: blur(0);
-transform: scale(1);
+  content:"";
+  position:fixed;
+  width:200%;
+  height:200%;
+  top:-50%;
+  left:-50%;
+  background: radial-gradient(circle, rgba(66,165,245,0.25), transparent 70%);
+  animation: floatBg 15s linear infinite;
+  z-index:-1;
 }
 
 /* INTRO */
 .intro {
-position: fixed;
-inset: 0;
-display: flex;
-justify-content: center;
-align-items: center;
-z-index: 99999;
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
 
-animation: introFadeOut 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-animation-delay: 2.4s;
+  animation: introFadeOut 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 3.5s;
 }
 
+/* WELCOME TEXT → PUTIH TANPA GRADIENT */
 .brand-intro {
-font-size: 35px;
-font-weight: 1000;
-letter-spacing: 5px;
-color: #ffffff;
+  font-size: 35px;
+  font-weight: 1000;
+  letter-spacing: 5px;
 
-opacity: 0;
-transform: scale(0.8);
+  color: #ffffff; /* ← FIX PUTIH */
+  background: none; /* ← HILANGKAN GRADIENT */
 
-animation: brandReveal 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
+  opacity: 0;
+  transform: scale(0.8);
 
-@keyframes brandReveal {
-0% {
-opacity: 0;
-transform: scale(0.8) translateY(20px);
-}
-100% {
-opacity: 1;
-transform: scale(1) translateY(0);
-}
+  animation: brandReveal 3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* MAIN */
 .main {
-height: 100vh;
-display: flex;
-justify-content: center;
-align-items: center;
-opacity: 0;
-transform: scale(1.05);
-filter: blur(10px);
-transition: opacity 0.5s ease;
-animation: revealMain 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-animation-delay: 2.8s;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  opacity: 0;
+  transform: scale(1.05);
+  filter: blur(10px);
+
+  animation: revealMain 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 3.7s;
 }
 
 /* CONTAINER */
 .container {
-text-align: center;
-padding: 25px;
-border-radius: 20px;
+  text-align: center;
+  padding: 25px;
+  border-radius: 20px;
 
-background: white;
-box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  background: white;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
-/* TITLE */
+/* TITLE → TRANSPARAN IKUT BACKGROUND */
 .title {
-font-size: 35px;
-font-weight: 1000;
+  font-size: 35px;
+  font-weight: 1000;
 
-background: linear-gradient(270deg, #e3f2fd, #bbdefb, #90caf9, #e3f2fd);
-background-size: 600% 600%;
-animation: gradientMove 6s ease infinite;
+  background: linear-gradient(270deg, #e3f2fd, #bbdefb, #90caf9, #e3f2fd);
+  background-size: 600% 600%;
+  animation: gradientMove 6s ease infinite;
 
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
-font-size: 11px;
-color: #555;
-margin-top: 8px;
+  font-size: 11px;
+  color: #555;
+  margin-top: 8px;
 }
 
-/* ANIMASI MAIN */
+/* ANIMATIONS */
+
+@keyframes brandReveal {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+    filter: blur(15px);
+  }
+
+  40% {
+    opacity: 1;
+    transform: scale(1.05);
+    filter: blur(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @keyframes revealMain {
-0% {
-opacity: 0;
-transform: scale(1.08) translateY(30px);
-filter: blur(15px);
-}
+  0% {
+    opacity: 0;
+    transform: scale(1.08) translateY(30px);
+    filter: blur(15px);
+  }
 
-100% {
-opacity: 1;
-transform: scale(1) translateY(0);
-filter: blur(0);
-}
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
 }
 
 @keyframes introFadeOut {
-to {
-opacity: 0;
-visibility: hidden;
-}
-}
-
-#detailDownload {
-position: fixed;
-bottom: 15px;
-left: 50%;
-transform: translateX(-50%);
-
-width: calc(100% - 30px);
-max-width: 700px;
-
-padding: 14px;
-font-size: 18px;
-font-weight: bold;
-border-radius: 12px;
-
-background: linear-gradient(135deg,#66bb6a,#a5d6a7);
-color: white;
-border: none;
-cursor: pointer;
-
-z-index: 999999; /* 🔥 ini penting biar selalu di atas */
-
-/* efek melayang */
-box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-
-/* biar smooth */
-transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.upload-btn {
-    padding: 6px 10px;
-    font-size: 12px;
-    font-weight: 1000; /* agak tebal */
-
-    background: white; /* background putih */
-    color: #1e88e5; /* biru */
-
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-
-    transition: 0.2s;
-}
-
-.upload-btn:hover {
-    background: #f5f5f5; /* dikit efek pas hover */
-}
-
-.upload-btn:active {
-    transform: scale(0.95);
-}
-
-</style>  </head>
-
-<body>    
-<div class="intro">    
-  <div class="brand-intro">WELCOME TO</div>    
-</div>  <div class="main">    
-  <div class="container">    
-    <div class="title">HiFin Mods⚙️</div>    
-    <div class="subtitle">❇️•kumpulan mods menarik•❇️<br>📦•dengan berbagai kategori dan tentunya gratis•✅</div>    
-  </div>    
-</div>  <div class="app" id="app">    
-<div class="header">    
-    <div class="header-top">      
-    <div style="display:flex; align-items:center; gap:10px;">
-        <div class="logo" onclick="openPin()">HiFin<br>Mods</div>
-        <button onclick="openUploadDirect()" class="upload-btn">
-    UPLOAD⏬
-</button>
-    </div>
-
-    <input class="search" id="search" placeholder="Cari mod...">      
-</div>  
-</div>  <div class="categories">      
-    <div class="cat active" data-cat="ALL">ALL</div>      
-    <div class="cat" data-cat="APK">APK</div>      
-    <div class="cat" data-cat="GAME">GAME</div>      
-    <div class="cat" data-cat="SCRIPT">SCRIPT</div>      
-    <div class="cat" data-cat="DLL">DLL</div>      
-</div>  <div class="mods" id="modsList"></div>  <!-- PIN PANEL -->  <div class="panel" id="pinPanel">      
-<div class="box">      
-<h3>Masukkan PIN</h3>      
-<input type="password" id="pinInput">      
-<button onclick="checkPin()">Masuk</button>      
-<button onclick="closePin()" style="background:#ccc; color:#333; margin-top:8px;">    
-    Tutup    
-</button>    
-</div>    
-</div>  <!-- MENU PANEL -->  <div class="panel" id="menuPanel">      
-<div class="box">      
-<h3 id="menuTitle">Menu Developer</h3>    <div id="menuButtons" style="display:flex; gap:10px;"></div>    
-</div>      
-</div>  <!-- UPLOAD -->  <div class="panel" id="uploadPanel">      
-<div class="box">      
-<h3>Upload Mod</h3>  <input id="title" placeholder="Judul">      
-<textarea id="desc"></textarea>  <select id="category">      
-<option>APK</option>      
-<option>GAME</option>      
-<option>SCRIPT</option>      
-<option>DLL</option>      
-</select>  <input id="link" placeholder="Link Download">      
-<label>Gambar 1 (Thumbnail)</label>    
-<input type="file" id="image1">    
-<div class="progress-box">    
-  <div class="progress-bar" id="progress1"></div>    
-  <span id="progressText1">0%</span>    
-</div>  <label>Gambar 2</label>  
-<input type="file" id="image2">  <div class="progress-box">    
-  <div class="progress-bar" id="progress2"></div>    
-  <span id="progressText2">0%</span>    
-</div>  <label>Gambar 3</label>  
-<input type="file" id="image3">  <div class="progress-box">    
-  <div class="progress-bar" id="progress3"></div>    
-  <span id="progressText3">0%</span>    
-</div>  <label>Gambar 4</label>  
-<input type="file" id="image4">  <div class="progress-box">    
-  <div class="progress-bar" id="progress4"></div>    
-  <span id="progressText4">0%</span>    
-</div>  <div id="previewImages" style="display:flex; gap:5px; flex-wrap:wrap;"></div>    
-<div style="display:flex; gap:10px;">    
-    <button onclick="saveMod()">Simpan</button>    
-    <button onclick="closeUpload()" style="background:#ccc;color:#333;">Kembali</button>    
-</div>  </div>      
-</div>     
-<!-- EDIT PANEL -->     
-<div class="panel" id="editPanel">      
-<div class="box">      
-<div style="display:flex; justify-content:space-between; align-items:center;">    
-    <h3>Edit Mod</h3>    
-    <button onclick="closeEditPanel()" style="background:#ccc;color:#333;">Kembali</button>    
-</div>    <div id="editList"></div>  <hr style="margin:15px 0">    
-</div>      
-</div>  <!-- EDIT FORM PANEL (BARU) -->  <div class="panel" id="editFormPanel">    
-<div class="box">    
-<div style="display:flex; justify-content:space-between; align-items:center;">    
-    <h3>Edit Mod</h3>    
-    <button onclick="closeEditForm()" style="background:#ccc;color:#333;">Kembali</button>    
-</div>  <select id="editCategory">    
-<option>APK</option>    
-<option>GAME</option>    
-<option>SCRIPT</option>    
-<option>DLL</option>    
-</select>  <input id="editTitle" placeholder="Judul">    
-<textarea id="editDesc"></textarea>  <input id="editLink" placeholder="Link Download">  <label>Gambar 1</label>  
-<input type="file" id="editImage1">  <div class="progress-box">    
-  <div class="progress-bar" id="editProgress1"></div>    
-  <span id="editProgressText1">0%</span>    
-</div>  <label>Gambar 2</label>  
-<input type="file" id="editImage2">  <div class="progress-box">    
-  <div class="progress-bar" id="editProgress2"></div>    
-  <span id="editProgressText2">0%</span>    
-</div>  <label>Gambar 3</label>  
-<input type="file" id="editImage3">  <div class="progress-box">    
-  <div class="progress-bar" id="editProgress3"></div>    
-  <span id="editProgressText3">0%</span>    
-</div>  <label>Gambar 4</label>  
-<input type="file" id="editImage4">  <div class="progress-box">    
-  <div class="progress-bar" id="editProgress4"></div>    
-  <span id="editProgressText4">0%</span>
-  <div id="editPreviewImages" style="display:flex; gap:5px; flex-wrap:wrap;"></div>
-</div>  <button onclick="updateMod()">Simpan Perubahan</button>  
-<button onclick="closeEditForm()" style="background:#ccc;color:#333;margin-top:8px;">  
-Kembali  
-</button>  </div>    
-</div>  <div id="detailPanel">    
-  <div id="detailContent">  <!-- HEADER -->    
-<div style="    
-display:flex;    
-align-items:center;    
-padding:15px;    
-border-bottom:1px solid #eee;    
-font-weight:bold;    
-font-size:18px;    
-">    
-    <span onclick="detailPanel.style.display='none'" style="margin-right:10px;cursor:pointer;">🔙</span>    
-    <span id="detailTitleTop"></span>    
-</div>  <!-- CONTENT -->  <div style="padding:15px; max-width:700px; margin:auto;">  <!-- THUMBNAIL 16:9 -->    <div style="  position:relative;
-width:100%;
-aspect-ratio:16/9;
-background:#eee;
-border-radius:10px;
-overflow:hidden;
-">
-
-<!-- IMAGE SLIDER -->    <img id="detailImg" style="width:100%; height:100%; object-fit:cover;">    <!-- BUTTON NAV -->    <button onclick="prevImg()" style="    
-position:absolute;    
-left:10px;    
-top:50%;    
-transform:translateY(-50%);    
-background:rgba(0,0,0,0.4);    
-border:none;    
-color:white;    
-font-size:18px;    
-padding:6px 10px;    
-border-radius:50%;    
-">❮</button>
-
-<button onclick="nextImg()" style="    
-position:absolute;    
-right:10px;    
-top:50%;    
-transform:translateY(-50%);    
-background:rgba(0,0,0,0.4);    
-border:none;    
-color:white;    
-font-size:18px;    
-padding:6px 10px;    
-border-radius:50%;    
-">❯</button>
-
-<!-- CATEGORY (KIRI BAWAH) -->  <span id="detailCategory" style="  
-position:absolute;  
-bottom:10px;  
-left:10px;  
-font-size:11px;  
-background:linear-gradient(135deg,#ff5252,#ff1744);  
-color:white;  
-padding:5px 8px;  
-border-radius:6px;  
-box-shadow:0 2px 6px rgba(0,0,0,0.2);  
-">
-</span>
-
-<!-- DOWNLOAD BUTTON (KANAN BAWAH) -->  <button id="detailDownloadSmall" style="  
-position:absolute;  
-bottom:10px;  
-right:10px;  
-padding:6px 10px;  
-font-size:12px;  
-border-radius:8px;  
-background:linear-gradient(135deg,#66bb6a,#a5d6a7);  
-color:white;  
-border:none;  
-cursor:pointer;  
-box-shadow:0 2px 8px rgba(0,0,0,0.3);  
-">
-⬇ Download
-</button>
-
-</div>  <!-- TITLE -->    
-<div class="detail-title-box">    
-<h2 id="detailTitle"></h2>  </div>  <!-- DESCRIPTION -->    
-<h4 style="margin-top:15px;">🧩 DESKRIPSI MOD</h4>    
-<p id="detailDesc" style="color:#555; line-height:1.6;"></p>    </div>    
-</div>    
-</div>  <!-- Firebase CDN -->    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>   <script>      
-// CONFIG FIREBASE      
-const firebaseConfig = {      
-  apiKey: "AIzaSyBoGzExHCZvLNnLHggB2sbst0t4l-tc3Mk",      
-  authDomain: "mods-31307.firebaseapp.com",      
-  projectId: "mods-31307",      
-  storageBucket: "mods-31307.firebasestorage.app",      
-  messagingSenderId: "913890186204",      
-  appId: "1:913890186204:web:4a652535f0fba62bda7519"      
-};      // INIT
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-let mods = [];
-let currentCategory = "ALL";
-let editIndex = null;
-let currentImages = [];
-let currentIndex = 0;
-let uploadQueue = [];
-let isUploading = false;
-let unsubscribe = null;
-
-// untuk upload panel
-let uploadedImages = [null, null, null, null];
-
-// untuk edit panel
-let editUploadedImages = [null, null, null, null];
-
-/* PIN */
-function openPin(){ pinPanel.style.display="block"; }
-function checkPin(){
-const pin = pinInput.value;
-
-pinPanel.style.display = "none";    
-menuPanel.style.display = "block";    
-
-const menu = document.getElementById("menuButtons");    
-const title = document.getElementById("menuTitle");  
-
-menu.innerHTML = "";    
-
-if(pin === "089514"){    
-    title.innerText = "Menu Developer";
-
-    menu.innerHTML = `    
-        <button onclick="openUpload()">Upload Mod</button>    
-        <button onclick="openEdit()">Edit Mod</button>    
-        <button onclick="closeMenu()" style="background:#ccc;color:#333;">Tutup</button>    
-    `;    
-}     
-else {    
-    alert("PIN salah!");    
-    pinPanel.style.display = "block";    
-    menuPanel.style.display = "none";    
-}
-}
-
-function openUploadDirect(){
-    uploadPanel.style.display = "block";
-}
-
-function closePin(){
-pinPanel.style.display = "none";
-}
-
-/* MENU */
-function openUpload(){
-menuPanel.style.display="none";
-uploadPanel.style.display="block";
-}
-function openEdit(){
-  menuPanel.style.display="none";
-  editPanel.style.display="block";
-
-  loadEditList();
-}
-
-/* SAVE KE FIREBASE */
-async function saveMod(){
-if(uploadedImages.every(img => img === null)){
-return alert("Upload gambar dulu!");
-}
-
-loadingOverlay.style.display = "flex";
-
-await db.collection("mods").add({  
-    title: title.value,  
-    desc: desc.value,  
-    category: category.value,  
-    link: link.value,  
-    images: uploadedImages.filter(x => x),
-    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-}); 
-
-loadingOverlay.style.display = "none";
-
-// popup sukses
-successPopup.style.display = "block";
-successPopup.style.transform = "translateX(-50%) scale(1)";
-
-setTimeout(() => {
-    successPopup.style.display = "none";
-}, 3000);
-
-uploadedImages = [null, null, null, null];  
-uploadPanel.style.display = "none";
-}
-
-function simulateProgress(barId, textId){
-let progress = 0;
-
-return new Promise(resolve => {    
-    const interval = setInterval(() => {    
-        progress += Math.random() * 15;    
-
-        if(progress >= 90){    
-            progress = 90;    
-            clearInterval(interval);    
-        }    
-
-        document.getElementById(barId).style.width = progress + "%";    
-        document.getElementById(textId).innerText = Math.floor(progress) + "%";    
-    }, 200);    
-
-    resolve(() => {    
-        document.getElementById(barId).style.width = "100%";    
-        document.getElementById(textId).innerText = "100%";    
-    });    
-});
-
-}
-
-/* LOAD DATA DARI FIREBASE */
-let isLoaded = false;
-
-function loadModsRealtime(){
-  console.log("🔥 Mulai koneksi ke Firestore...");
-
-  // 🔥 HENTIKAN listener lama
-  if(unsubscribe){
-    unsubscribe();
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
   }
-
-  unsubscribe = db.collection("mods")
-  .orderBy("updatedAt", "desc")
-  .onSnapshot(snapshot => {    
-    console.log("✅ Firestore berhasil connect");  
-
-    mods = [];
-
-    snapshot.forEach(doc => {    
-      const data = doc.data();
-
-      mods.push({    
-        id: doc.id,    
-        ...data,
-        updatedAt: data.updatedAt || data.createdAt || 0,
-        images: data.images || [data.image]    
-      });    
-    });
-
-    applyFilter();    
-
-  }, err => {  
-    console.error("❌ Firestore error:", err);  
-  });
 }
 
-function loadEditList(){
-editList.innerHTML = "";
-
-mods.forEach((mod, index) => {      
-    const div = document.createElement("div");      
-
-    div.innerHTML = `      
-        <div style="margin-bottom:10px; padding:10px; border:1px solid #ddd; border-radius:8px;">      
-            <b>${mod.title}</b><br>      
-            <small>${mod.category}</small><br>      
-            <button onclick="selectEdit(${index})">Edit</button>      
-            <button onclick="deleteMod(${index})">Hapus</button>      
-        </div>      
-    `;      
-
-    editList.appendChild(div);      
-});
-
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-function selectEdit(index){
-editIndex = index;
-const mod = mods[index];
-
-editTitle.value = mod.title;    
-editDesc.value = mod.desc;    
-editCategory.value = mod.category;    
-editLink.value = mod.link;    
-
-// pindah panel    
-editPanel.style.display = "none";    
-editFormPanel.style.display = "block";
-
+@keyframes floatBg {
+  0% { transform:translate(0,0); }
+  50% { transform:translate(50px,50px); }
+  100% { transform:translate(0,0); }
 }
 
-function closeEditForm(){
-editFormPanel.style.display = "none";
-editPanel.style.display = "block";
-editIndex = null;
-}
+</style>
+</head>
 
-async function deleteMod(index){
-const mod = mods[index];
+<body>
 
-if(confirm("Yakin mau hapus mod ini?")){      
-    await db.collection("mods").doc(mod.id).delete();      
-  
-    alert("Mod berhasil dihapus!");      
-    loadModsRealtime();      
-    loadEditList();      
-}
-
-}
-
-async function updateMod(){
-if(editIndex === null) return alert("Pilih mod dulu!");
-
-loadingOverlay.style.display = "flex";
-
-const mod = mods[editIndex];  
-
-let finalImages = [...mod.images];  
-
-editUploadedImages.forEach((img, i) => {  
-    if(img !== null){  
-        finalImages[i] = img;  
-    }  
-});  
-
-await db.collection("mods").doc(mod.id).update({  
-    title: editTitle.value,  
-    desc: editDesc.value,  
-    category: editCategory.value,  
-    link: editLink.value,  
-    images: finalImages,
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-});
-
-loadingOverlay.style.display = "none";
-
-successPopup.style.display = "block";
-successPopup.style.transform = "translate(-50%, -50%) scale(1)";
-
-setTimeout(() => {
-    successPopup.style.display = "none";
-}, 3000);
-
-editUploadedImages = [null, null, null, null];
-}
-
-/* CARD */
-function createCard(mod){
-const d=document.createElement("div");
-d.className="card";
-// Menambahkan onerror agar jika gambar rusak, tidak kosong melompong
-d.innerHTML=`
-<div class="thumb">
-<img   
-loading="lazy"  
-decoding="async"  
-src="${mod.images[0] || 'https://via.placeholder.com/300x169?text=No+Image'}"  
-onload="this.style.opacity=1"  
-onerror="this.src='https://via.placeholder.com/300x169?text=Error'"  
-style="opacity:0; transition:0.3s;">
-
-</div>    
-    <div class="card-content">      
-        <span class="badge">${mod.category}</span>      
-        <h4 style="margin:5px 0">${mod.title}</h4>      
-        <p style="font-size:12px; color:#666">${mod.desc}</p>      
-        <button class="download-btn" onclick="openDetail(${mods.indexOf(mod)})">View</button>      
-    </div>`;      
-    console.log("IMG:", mod.images);      
-    const img = new Image();  
-img.src = mod.images[0];  
-    return d;      
-}      /* FILTER */
-function applyFilter(){
-let f=mods;
-
-if(currentCategory!=="ALL"){      
-    f=f.filter(m=>m.category===currentCategory);      
-}      
-  
-const k=search.value.toLowerCase();      
-f=f.filter(m=>m.title.toLowerCase().includes(k)||m.desc.toLowerCase().includes(k));      
-  
-renderMods(f);
-
-}
-
-function renderMods(data) {
-const fragment = document.createDocumentFragment(); // Wadah sementara di memori
-modsList.innerHTML = "";
-
-data.forEach(m => {    
-    fragment.appendChild(createCard(m));    
-});    
-    
-modsList.appendChild(fragment); // Render ke layar cuma 1 kali
-
-}
-
-function openDetail(index){
-const mod = mods[index];
-
-detailPanel.style.display = "block";    
-
-// 🔥 FIX SCROLL KE ATAS  
-detailPanel.scrollTop = 0;  
-window.scrollTo(0, 0);  
-
-currentImages = mod.images;    
-currentIndex = 0;    
-
-updateDetailImage();    
-
-detailTitle.innerText = mod.title;      
-detailTitleTop.innerText = mod.title;      
-detailDesc.innerText = mod.desc;      
-detailCategory.innerText = mod.category;      
-
-document.getElementById("detailDownloadSmall").onclick = () => {  
-    window.open(mod.link);  
-};
-
-}
-
-detailPanel.addEventListener("click", function(e){
-if(!document.getElementById("detailContent").contains(e.target)){
-// klik di luar konten → DIABAIKAN
-e.stopPropagation();
-}
-});
-
-function updateDetailImage(){
-detailImg.src = currentImages[currentIndex];
-}
-
-function closeMenu(){
-menuPanel.style.display = "none";
-}
-
-function closeUpload(){
-uploadPanel.style.display = "none";
-menuPanel.style.display = "block";
-}
-
-function closeEditPanel(){
-editPanel.style.display = "none";
-menuPanel.style.display = "block";
-}
-
-function nextImg(){
-if(currentIndex < currentImages.length - 1){
-currentIndex++;
-} else {
-currentIndex = 0;
-}
-updateDetailImage();
-}
-
-function prevImg(){
-if(currentIndex > 0){
-currentIndex--;
-} else {
-currentIndex = currentImages.length - 1;
-}
-updateDetailImage();
-}
-
-/* EVENTS */
-let searchTimeout;
-search.oninput = () => {
-clearTimeout(searchTimeout);
-searchTimeout = setTimeout(applyFilter, 150);
-};
-
-document.querySelectorAll(".cat").forEach(el=>{
-el.onclick=()=>{
-currentCategory=el.dataset.cat;
-document.querySelectorAll(".cat").forEach(c=>c.classList.remove("active"));
-el.classList.add("active");
-applyFilter();
-}
-});
-
-function previewImage(input, index, mode="upload"){
-const preview = mode === "edit"
-  ? document.getElementById("editPreviewImages")
-  : document.getElementById("previewImages");
-
-const file = input.files[0];    
-if(!file) return;    
-
-const wrapper = document.createElement("div");
-wrapper.style.position = "relative";
-
-const img = document.createElement("img");    
-img.style.width = "60px";    
-img.style.height = "60px";    
-img.style.objectFit = "cover";    
-img.style.borderRadius = "6px";    
-img.src = URL.createObjectURL(file);    
-
-// ICON CEKLIS
-const check = document.createElement("div");
-check.innerText = "✅";
-check.style.position = "absolute";
-check.style.top = "2px";
-check.style.right = "2px";
-check.style.fontSize = "16px";
-check.style.display = "none";
-
-wrapper.appendChild(img);
-wrapper.appendChild(check);
-preview.appendChild(wrapper);
-
-// simpan referensi
-wrapper.dataset.index = index;
-wrapper.dataset.mode = mode;
-}
-
-async function uploadImage(file){
-console.log("UPLOAD FILE:", file.name, file.size);
-
-const formData = new FormData();  
-formData.append("file", file);  
-formData.append("upload_preset", "Hifin_Web");  
-
-try {  
-    const res = await fetch("https://api.cloudinary.com/v1_1/dvch9imk2/image/upload", {  
-        method: "POST",  
-        body: formData  
-    });  
-
-    const data = await res.json();  
-
-    console.log("CLOUDINARY RESPONSE:", data);  
-
-    if(!res.ok){  
-        throw new Error(data.error?.message || "Upload gagal");  
-    }  
-
-    return data.secure_url;  
-
-} catch(err){  
-    console.error("UPLOAD ERROR:", err);  
-    throw err;  
-}
-
-}
-
-function delay(ms){
-return new Promise(res => setTimeout(res, ms));
-}
-
-async function processQueue(type = "upload"){
-if(isUploading) return;
-isUploading = true;
-
-while(uploadQueue.length > 0){  
-    const { file, index, mode } = uploadQueue.shift();  
-
-    const barId = (mode === "edit" ? "editProgress" : "progress") + (index + 1);  
-    const textId = (mode === "edit" ? "editProgressText" : "progressText") + (index + 1);  
-
-    document.getElementById(textId).innerText = "Uploading...";  
-
-    try {  
-        const url = await uploadImage(file);  
-
-        if(mode === "edit"){  
-            editUploadedImages[index] = url;  
-        } else {  
-            uploadedImages[index] = url;  
-        }  
-        
-        // tampilkan ceklis
-const container = mode === "edit"
-  ? "#editPreviewImages"
-  : "#previewImages";
-
-document.querySelectorAll(container + " > div").forEach(w => {
-    const idx = parseInt(w.dataset.index);
-    const m = w.dataset.mode;
-
-    if(idx === index && m === mode){
-        const check = w.querySelector("div:last-child");
-        if(check) check.style.display = "block";
-    }
-});
-
-document.getElementById(barId).style.width = "100%";  
-document.getElementById(textId).innerText = "100%";
-
-    } catch(err){  
-        document.getElementById(textId).innerText = "Error";  
-    }  
-
-    await delay(1000); // ⏱️ delay antar upload  
-}  
-
-isUploading = false;  
-checkUploadDone();
-
-}
-
-function checkUploadDone(){
-const uploadReady = uploadedImages.some(x => x !== null);
-const editReady = editUploadedImages.some(x => x !== null);
-
-const saveBtn = document.querySelector("button[onclick='saveMod()']");
-const updateBtn = document.querySelector("button[onclick='updateMod()']");
-
-if(saveBtn){  
-    saveBtn.disabled = !uploadReady || isUploading;  
-}  
-
-// 🔥 FIX DI SINI
-if(updateBtn){  
-    updateBtn.disabled = isUploading;  
-}
-}
-
-// UPLOAD PANEL
-image1.onchange = () => {
-previewImage(image1, 0, "upload");
-uploadQueue.push({ file: image1.files[0], index: 0, mode: "upload" });
-processQueue();
-};
-
-image2.onchange = () => {
-previewImage(image2, 1, "upload");
-uploadQueue.push({ file: image2.files[0], index: 1, mode: "upload" });
-processQueue();
-};
-
-image3.onchange = () => {
-previewImage(image3, 2, "upload");
-uploadQueue.push({ file: image3.files[0], index: 2, mode: "upload" });
-processQueue();
-};
-
-image4.onchange = () => {
-previewImage(image4, 3, "upload");
-uploadQueue.push({ file: image4.files[0], index: 3, mode: "upload" });
-processQueue();
-};
-
-// EDIT PANEL
-editImage1.onchange = () => {
-previewImage(editImage1, 0, "edit");
-uploadQueue.push({ file: editImage1.files[0], index: 0, mode: "edit" });
-processQueue();
-};
-
-editImage2.onchange = () => {
-previewImage(editImage2, 1, "edit");
-uploadQueue.push({ file: editImage2.files[0], index: 1, mode: "edit" });
-processQueue();
-};
-
-editImage3.onchange = () => {
-previewImage(editImage3, 2, "edit");
-uploadQueue.push({ file: editImage3.files[0], index: 2, mode: "edit" });
-processQueue();
-};
-
-editImage4.onchange = () => {
-previewImage(editImage4, 3, "edit");
-uploadQueue.push({ file: editImage4.files[0], index: 3, mode: "edit" });
-processQueue();
-};
-
-const editPanel = document.getElementById("editPanel");
-const editFormPanel = document.getElementById("editFormPanel");
-
-/* INIT LOAD */
-checkUploadDone();
-
-/* INTRO */
-const app = document.getElementById("app");
-
-window.addEventListener("load", () => {
-setTimeout(() => {
-document.querySelector(".main").style.display = "none";
-app.classList.add("show");
-
-// 🔥 Tambahin ini  
-    loadModsRealtime();  
-
-}, 5500);
-
-});
-
-</script> 
-<div id="loadingOverlay" style="
-position:fixed;
-top:60px;
-left:50%;
-transform:translateX(-50%);
-background:rgba(0,0,0,0.7);
-padding:10px 20px;
-border-radius:10px;
-display:none;
-z-index:999999;
-color:white;
-font-size:25px;
-">
-    ⏳ Loading...
+<div class="intro">
+  <div class="brand-intro">WELCOME TO</div>
 </div>
-<div id="successPopup" style="
-position:fixed;
-top:75px;
-left:50%;
-transform:translateX(-50%) scale(0.5);
-font-size:40px;
-display:none;
-z-index:999999;
-transition:0.3s;
-background:white;
-padding:10px;
-border-radius:10px;
-box-shadow:0 5px 15px rgba(0,0,0,0.3);
-">
-    ✅
+
+<div class="main">
+  <div class="container">
+    <div class="title">HiFin Mods⚙️</div>
+    <div class="subtitle">Berbagai Mods Gratis Yang Menarik✅</div>
+  </div>
 </div>
+
 </body>
-</html>  
+</html>
