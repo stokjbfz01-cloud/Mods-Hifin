@@ -741,6 +741,7 @@ let currentImages = [];
 let currentIndex = 0;
 let uploadQueue = [];
 let isUploading = false;
+let unsubscribe = null;
 
 // untuk upload panel
 let uploadedImages = [null, null, null, null];
@@ -790,13 +791,11 @@ function openUpload(){
 menuPanel.style.display="none";
 uploadPanel.style.display="block";
 }
-async function openEdit(){
-menuPanel.style.display="none";
-editPanel.style.display="block";
+function openEdit(){
+  menuPanel.style.display="none";
+  editPanel.style.display="block";
 
-await loadModsRealtime(); // ambil data dulu      
-loadEditList();   // baru tampilkan
-
+  loadEditList();
 }
 
 /* SAVE KE FIREBASE */
@@ -812,8 +811,10 @@ await db.collection("mods").add({
     desc: desc.value,  
     category: category.value,  
     link: link.value,  
-    images: uploadedImages.filter(x => x)  
-});  
+    images: uploadedImages.filter(x => x),
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+}); 
 
 loadingOverlay.style.display = "none";
 
@@ -857,26 +858,36 @@ return new Promise(resolve => {
 let isLoaded = false;
 
 function loadModsRealtime(){
-console.log("🔥 Mulai koneksi ke Firestore...");
+  console.log("🔥 Mulai koneksi ke Firestore...");
 
-db.collection("mods").onSnapshot(snapshot => {    
+  // 🔥 HENTIKAN listener lama
+  if(unsubscribe){
+    unsubscribe();
+  }
+
+  unsubscribe = db.collection("mods")
+  .orderBy("updatedAt", "desc")
+  .onSnapshot(snapshot => {    
     console.log("✅ Firestore berhasil connect");  
 
-    mods = [];    
+    mods = [];
 
-    snapshot.forEach(doc=>{    
-        mods.push({    
-            id: doc.id,    
-            ...doc.data(),    
-            images: doc.data().images || [doc.data().image]    
-        });    
-    });    
+    snapshot.forEach(doc => {    
+      const data = doc.data();
+
+      mods.push({    
+        id: doc.id,    
+        ...data,
+        updatedAt: data.updatedAt || data.createdAt || 0,
+        images: data.images || [data.image]    
+      });    
+    });
 
     applyFilter();    
-}, err => {  
-    console.error("❌ Firestore error:", err);  
-});
 
+  }, err => {  
+    console.error("❌ Firestore error:", err);  
+  });
 }
 
 function loadEditList(){
@@ -953,8 +964,9 @@ await db.collection("mods").doc(mod.id).update({
     desc: editDesc.value,  
     category: editCategory.value,  
     link: editLink.value,  
-    images: finalImages  
-});  
+    images: finalImages,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+});
 
 loadingOverlay.style.display = "none";
 
@@ -1230,17 +1242,17 @@ function checkUploadDone(){
 const uploadReady = uploadedImages.some(x => x !== null);
 const editReady = editUploadedImages.some(x => x !== null);
 
-const saveBtn = document.querySelector("button[onclick='saveMod()']");  
-const updateBtn = document.querySelector("button[onclick='updateMod()']");  
+const saveBtn = document.querySelector("button[onclick='saveMod()']");
+const updateBtn = document.querySelector("button[onclick='updateMod()']");
 
 if(saveBtn){  
     saveBtn.disabled = !uploadReady || isUploading;  
 }  
 
+// 🔥 FIX DI SINI
 if(updateBtn){  
-    updateBtn.disabled = !editReady || isUploading;  
+    updateBtn.disabled = isUploading;  
 }
-
 }
 
 // UPLOAD PANEL
@@ -1298,20 +1310,6 @@ const editFormPanel = document.getElementById("editFormPanel");
 
 /* INIT LOAD */
 checkUploadDone();
-
-setInterval(async () => {
-const snapshot = await db.collection("mods").get();
-let newData = [];
-
-snapshot.forEach(doc=>{    
-    newData.push(doc.id);    
-});    
-
-if(newData.length !== mods.length){    
-    loadModsRealtime();    
-}
-
-}, 10000);
 
 /* INTRO */
 const app = document.getElementById("app");
